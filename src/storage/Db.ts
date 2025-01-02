@@ -1,11 +1,63 @@
 import sqlite3 from 'sqlite3';
-import {Server} from '../gameServers/serverTypes'
+import {GameGuild, Server} from '../InteractionBackend/serverTypes'
 
 const { Database } = sqlite3;
 
 const db = new Database('storage/database.sqlite');
 
-export async function UpdateOrAddGuild(guildId: string, defaultURL: string = ""): Promise<void> {
+export async function GetGuild(guildId: string): Promise<GameGuild> {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.get(`SELECT *
+                    FROM Guilds
+                    WHERE Id = ?`, [guildId], async (err, row) => {
+                if (err) {
+                    return reject(`Error retrieving guild: ${err.message}`);
+                }
+                if (row) {
+                    const gameGuild: GameGuild = {
+                        id: row["Id"],
+                        adminId: row["AdminId"],
+                        loggingChannelId: row["LoggingChannelId"],
+                        loggingChannelInterval: row["LoggingChannelInterval"]
+                    };
+                    try {
+                        gameGuild.defaultServer = await GetDefaultServer(guildId)
+                    }
+                    catch {}
+                    resolve(gameGuild);
+                }
+            })
+        })
+    })
+}
+export async function GetGuilds(): Promise<GameGuild[]> {
+    return new Promise((resolve, reject) => {
+        db.serialize(() => {
+            db.all(`SELECT * FROM Guilds`, async (err, rows) => {
+                if (err) {
+                    reject(`Error retrieving guilds: ${err.message}`);
+                    return;
+                }
+                if (rows) {
+                    try {
+                        const guilds: GameGuild[] = await Promise.all(
+                            rows.map(async row => await GetGuild(row["Id"]))
+                        );
+                        resolve(guilds)
+                    }
+                    catch (error) {
+                        reject(`Error processing guilds: ${error.message}`);
+                    }
+                }
+                else {
+                    resolve([]);
+                }
+            })
+        })
+    })
+}
+export async function UpdateOrAddGuild(guildId: string, defaultURL: string = null, adminId: string = null, loggingChannelId: string = null, loggingChannelInterval: string = null): Promise<void> {
     return new Promise((resolve, reject) => {
         db.serialize(() => {
             db.get(`SELECT *
@@ -15,18 +67,49 @@ export async function UpdateOrAddGuild(guildId: string, defaultURL: string = "")
                     return reject(`Error retrieving guild: ${err.message}`);
                 }
 
-                if (row && defaultURL != "") {
+                if (row && defaultURL!=null) {
                     db.run(`UPDATE Guilds
-                            SET defaultServer = ?
-                            WHERE Id = ?`, [defaultURL, guildId], (err) => {
+                            SET DefaultServerURL = ?
+                            WHERE Id = ?`, [defaultURL == "" ? null: defaultURL, guildId], (err) => {
                         if (err) {
                             return reject(`Error updating guild: ${err.message}`);
                         }
                         resolve();
                     });
-                } else if (!row) {
-                    db.run(`INSERT INTO Guilds (Id, defaultServer)
-                            VALUES (?, ?)`, [guildId, defaultURL], (err) => {
+                }
+                if (row && adminId!=null) {
+                    db.run(`UPDATE Guilds
+                            SET AdminId = ?
+                            WHERE Id = ?`, [adminId == "" ? null: adminId, guildId], (err) => {
+                        if (err) {
+                            return reject(`Error updating guild: ${err.message}`);
+                        }
+                        resolve();
+                    });
+                }
+                if (row && loggingChannelId!=null) {
+                    db.run(`UPDATE Guilds
+                            SET LoggingChannelId = ?
+                            WHERE Id = ?`, [loggingChannelId == "" ? null: loggingChannelId, guildId], (err) => {
+                        if (err) {
+                            return reject(`Error updating guild: ${err.message}`);
+                        }
+                        resolve();
+                    });
+                }
+                if (row && loggingChannelInterval!=null) {
+                    db.run(`UPDATE Guilds
+                            SET LoggingChannelInterval = ?
+                            WHERE Id = ?`, [loggingChannelInterval == "" ? null: loggingChannelInterval, guildId], (err) => {
+                        if (err) {
+                            return reject(`Error updating guild: ${err.message}`);
+                        }
+                        resolve();
+                    });
+                }
+                if (!row) {
+                    db.run(`INSERT INTO Guilds (Id, DefaultServerURL, AdminId, LoggingChannelId)
+                            VALUES (?, ?, ?, ?)`, [guildId, defaultURL, adminId, loggingChannelId], (err) => {
                         if (err) {
                             return reject(`Error adding new guild: ${err.message}`);
                         }
@@ -106,7 +189,7 @@ export async function GetDefaultServer(guildId: string): Promise<Server> {
             if (row) {
                 db.get(`SELECT *
                     FROM GuildServer
-                    WHERE GuildId = ? AND URL = ?`, [guildId, row["defaultServer"]], (err, serverRow) => {
+                    WHERE GuildId = ? AND URL = ?`, [guildId, row["DefaultServerURL"]], (err, serverRow) => {
                 if (err) {
                     return reject(`Error getting info for defaultServer: ${err.message}`);
                 }
@@ -118,7 +201,7 @@ export async function GetDefaultServer(guildId: string): Promise<Server> {
                     resolve(server);
                 }
                 else {
-                    return reject(`Default Server: ${row["defaultServer"]} does not have an entry in GuildServer table`)
+                    return reject(`Default Server: ${row["DefaultServerURL"]} does not have an entry in GuildServer table`)
                 }
                 })
             }
@@ -138,9 +221,9 @@ export async function RemoveServer(guildId: string, server: Server): Promise<voi
             if (err) {
                 return reject(`Error selecting from Guilds`);
             }
-            if (row && row["defaultServer"] == server.URL) {
+            if (row && row["DefaultServerURL"] == server.URL) {
                 db.run(`UPDATE Guilds
-                    SET defaultServer = ?
+                    SET DefaultServerURL = ?
                     WHERE GuildId = ?`, ["", guildId], (err) => {
                 if (err) {
                     return reject('Error resetting defaultServer');

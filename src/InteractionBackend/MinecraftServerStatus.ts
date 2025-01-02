@@ -1,7 +1,9 @@
 import {AttachmentBuilder, EmbedBuilder, InteractionReplyOptions} from "discord.js";
 import { createCanvas, loadImage } from 'canvas';
+import {GameGuild} from "./serverTypes";
+import {GetPlayersImage} from "../commands/common.js";
 
-export async function getReply(serverUrl: string): Promise<InteractionReplyOptions> {
+export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise<InteractionReplyOptions> {
     const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${serverUrl}`);
     /*const serverData = {
         "ip": "208.26.80.224",
@@ -75,11 +77,14 @@ export async function getReply(serverUrl: string): Promise<InteractionReplyOptio
         "eula_blocked": false
     }*/
     const serverData = await serverInfo.json();
-
+    let content= ""
     const embed = new EmbedBuilder()
         .setTitle(`Info for Minecraft Server: ${serverUrl}`);
 
     if (!serverData.online) {
+        if (gameGuild.adminId) {
+            content = `Attention <@${gameGuild.adminId}>!`;
+        }
         embed.setDescription(`Server url invalid or server is offline`);
     }
     else {
@@ -89,22 +94,9 @@ export async function getReply(serverUrl: string): Promise<InteractionReplyOptio
                 .setTitle(`Info for Minecraft Server: ${serverUrl}`)
                 .addFields([
                     {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
-                    {name: 'Max Players', value: `${serverData.players.max}`, inline: true},
                     { name: '\u200B', value: '\u200B' },
                 ]);
             try {
-                const playerImages = await Promise.all(serverData.players.list.map(async (player) => {
-                    const imageUrl = `https://api.mineatar.io/face/${player.uuid}`;
-                    const image = await loadImage(imageUrl);
-                    return image;
-                }));
-
-                const canvas = createCanvas(playerImages.length * (32), 32); // 32x32 images with 10 px buffer
-                const ctx = canvas.getContext('2d');
-
-                playerImages.forEach((image, index) => {
-                    ctx.drawImage(image, index * (32), 0);
-                });
                 let playerNameString = "";
                 for (let i = 0; i < serverData.players.list.length; i++) {
                     const player = serverData.players.list[i];
@@ -113,10 +105,7 @@ export async function getReply(serverUrl: string): Promise<InteractionReplyOptio
                 playerNameString = playerNameString.trim().slice(0, -1);
                 embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
 
-
-
-                const combinedImage = canvas.toBuffer();
-
+                const combinedImage = await GetPlayersImage(serverData.players);
                 const playerImage = new AttachmentBuilder(combinedImage, {name: 'players.png'});
                 embed.setImage(`attachment://players.png`);
 
@@ -131,7 +120,7 @@ export async function getReply(serverUrl: string): Promise<InteractionReplyOptio
 
     }
     //.setImage(getLogoUrl());
-    return {embeds: [embed]};
+    return {content: content, embeds: [embed]};
 
 }
 

@@ -1,12 +1,12 @@
 import {
     ActionRowBuilder, ChatInputCommandInteraction,
-    ComponentType, EmbedBuilder, Interaction, InteractionReplyOptions, Message,
+    ComponentType, EmbedBuilder, Guild, Interaction, InteractionReplyOptions, Message,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
 } from "discord.js";
-import {functionMap, Server, ServerTypes} from "../gameServers/serverTypes.js";
-import {GetDefaultServer, GetServers, UpdateOrAddGuild, UpdateOrAddGuildServer} from "../storage/Db.js";
+import {functionMap, GameGuild, Server, ServerTypes} from "../InteractionBackend/serverTypes.js";
+import {GetDefaultServer, GetGuild, GetServers, UpdateOrAddGuild, UpdateOrAddGuildServer} from "../storage/Db.js";
 import {AddServerSelectMenu, GetServerChoices} from "./common.js";
 
 export const McStatusCommand = new SlashCommandBuilder()
@@ -21,34 +21,27 @@ export const McStatusCommand = new SlashCommandBuilder()
 
 export async function interactionMcStatus(interaction): Promise<void> {
     if (interaction.commandName === 'server-status' && interaction.isChatInputCommand()) {
-
-        const select = new StringSelectMenuBuilder()
-            .setCustomId('select-server')
-            .setPlaceholder('Select a server')
-        await AddServerSelectMenu(interaction.guildId, select);
-
-
-
         // @ts-ignore
         let reply: InteractionReplyOptions = {fetchReply: true};
         let serverReply: InteractionReplyOptions = {};
         let server: Server = {URL: "", Type: ServerTypes.Minecraft}; //defining server just to make the compiler happy
+        let guild: GameGuild = await GetGuild(interaction.guildId)
 
         if (interaction.options.getString('server')) {
             server =JSON.parse(interaction.options.getString('server'))
             try {
-                serverReply = await functionMap[server.Type](server.URL);
+                serverReply = await functionMap[server.Type+'status'](guild, server.Alias ?? server.URL);
             }
             catch {
                 reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
             }
         }
         else {
-            let defaultServer;
+            let defaultServer: Server;
             try {
                 defaultServer = await GetDefaultServer(interaction.guildId);
                 try {
-                    serverReply = await functionMap[defaultServer.Type](defaultServer.URL);
+                    serverReply = await functionMap[defaultServer.Type+'status'](guild, defaultServer.URL);
                 }
                 catch {
                     reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
@@ -67,6 +60,11 @@ export async function interactionMcStatus(interaction): Promise<void> {
         console.log({...reply,...serverReply});
         const serverChoices = await GetServerChoices(interaction.guildId);
         if (serverChoices.length > 1) {
+            const select = new StringSelectMenuBuilder()
+                .setCustomId('select-server')
+                .setPlaceholder('Select a server')
+            await AddServerSelectMenu(interaction.guildId, select);
+
             const row = new ActionRowBuilder()
                 .addComponents(select);
             // @ts-ignore
@@ -79,7 +77,7 @@ export async function interactionMcStatus(interaction): Promise<void> {
             collector.on('collect', async i => {
                 const server: Server = JSON.parse(i.values[0])
                 try {
-                    serverReply = await functionMap[server.Type](server.URL);
+                    serverReply = await functionMap[server.Type+'status'](guild, server.Alias ?? server.URL);
                 }
                 catch {}
 

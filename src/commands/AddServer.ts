@@ -1,5 +1,5 @@
 import { PermissionFlagsBits, SlashCommandBuilder} from "discord.js";
-import {Server, ServerTypes} from "../gameServers/serverTypes.js";
+import {Server, ServerTypes} from "../InteractionBackend/serverTypes.js";
 import {UpdateOrAddGuild, UpdateOrAddGuildServer} from "../storage/Db.js";
 import {ChoiceOption, GetServerChoices} from "./common.js";
 
@@ -28,7 +28,7 @@ export const AddServerCommand = new SlashCommandBuilder()
             .setDescription('A friendly name to refer to the server as')
             .setRequired(false)
     )
-    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers)
+    .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers);
 
 export async function interactionAddServer(interaction) {
     if (!interaction.isChatInputCommand()) return;

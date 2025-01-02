@@ -1,1 +1,0 @@
-{"version":3,"file":"TerrariaServer.js","sourceRoot":"","sources":["../../src/gameServers/TerrariaServer.ts"],"names":[],"mappings":"AAAA,OAAO,EAAC,YAAY,EAA0B,MAAM,YAAY,CAAC;AAEjE,MAAM,CAAC,KAAK,UAAU,QAAQ,CAAC,SAAiB;IAE5C,MAAM,KAAK,GAAG,IAAI,YAAY,EAAE,CAAA;IAChC,KAAK,CAAC,QAAQ,CAAC,+BAA+B,CAAC,CAAA;IAE/C,OAAO,EAAC,MAAM,EAAE,CAAC,KAAK,CAAC,EAAC,CAAC;AAC7B,CAAC"}
