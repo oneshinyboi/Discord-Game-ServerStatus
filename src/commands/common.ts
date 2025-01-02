@@ -1,8 +1,8 @@
 import {GetGuilds, GetServers} from "../storage/Db.js";
-import {AttachmentBuilder, SelectMenuBuilder, StringSelectMenuOptionBuilder} from "discord.js";
+import {SelectMenuBuilder, StringSelectMenuOptionBuilder} from "discord.js";
 import {GameGuild, Server, ServerTypes} from "../InteractionBackend/serverTypes.js";
 import {logPlayerChange} from "../InteractionBackend/LogPlayerChange.js";
-import {Canvas, createCanvas, Image, loadImage} from "canvas";
+import {createCanvas, loadImage} from "canvas";
 
 
 export type ChoiceOption = {
@@ -44,7 +44,7 @@ export function TryGetServer(interaction): {server: Server, result: boolean} {
 }
 export function StartLogging(guild: GameGuild) {
     StopLogging(guild);
-
+    guild.serverOnline = true;
     const intervalId = setInterval(async () => {
         await logPlayerChange(guild);
     }, guild.loggingChannelInterval * 60 * 1000)

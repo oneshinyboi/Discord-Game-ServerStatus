@@ -26,9 +26,6 @@ export async function logPlayerChange(gameGuild: GameGuild) {
         }
         return;
     }
-    if (serverData.online) {
-        gameGuild.serverOnline = true;
-    }
     if (gameGuild.currentPlayersList) {
         const oldUUIDs = new Set(gameGuild.currentPlayersList.map(player => player.uuid));
         const newUUIDs = new Set(serverData.players.list.map(player => player.uuid));
@@ -77,5 +74,9 @@ export async function logPlayerChange(gameGuild: GameGuild) {
             }
         }
     }
-    gameGuild.currentPlayersList = serverData.players.list;
+    if (serverData.online) {
+        gameGuild.serverOnline = true;
+        gameGuild.currentPlayersList = serverData.players.list;
+
+    }
 }
