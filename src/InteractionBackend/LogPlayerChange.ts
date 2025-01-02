@@ -1,8 +1,8 @@
 import {GameGuild} from "./serverTypes.js";
-import {AttachmentBuilder, Embed, EmbedBuilder, TextChannel} from "discord.js";
+import {AttachmentBuilder, EmbedBuilder, TextChannel} from "discord.js";
 import {GetPlayersImage} from "../commands/common.js";
 import {client} from "../main.js";
-import {GetGuild, GetGuilds} from "../storage/Db.js";
+import {GetGuild} from "../storage/Db.js";
 
 export async function logPlayerChange(gameGuild: GameGuild) {
     const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${gameGuild.defaultServer.URL}`);
@@ -46,11 +46,11 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 playerNameString = playerNameString.trim().slice(0, -1);
                 if (joined.length > 0) embed.addFields([{
                     name: 'Joined:',
-                    value: joined.map(player => player.name).join('\n')
+                    value: joined.map(player => player.name).join(', ')
                 }])
                 if (left.length > 0) embed.addFields([{
                     name: 'Left:',
-                    value: left.map(player => player.name).join('\n')
+                    value: left.map(player => player.name).join(', ')
                 }])
                 embed.addFields([
                     { name: '\u200B', value: '\u200B' },
