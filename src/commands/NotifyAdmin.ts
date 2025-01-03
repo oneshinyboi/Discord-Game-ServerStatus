@@ -31,12 +31,23 @@ export async function interactionNotifyAdmin(interaction): Promise<void> {
                 });
                 return;
             }
-            await UpdateOrAddGuild(interaction.guildId, null, target.id, null)
-            const targetType = target.user ? 'user' : 'role';
-            await interaction.reply({
-                content: `Notifications enabled! The ${targetType} <@${target.id}> will be notified when the server is down.`,
-                ephemeral: true,
-            });
+            if (target.id == interaction.guildId) {
+                await UpdateOrAddGuild(interaction.guildId, null, "@everyone", null)
+
+                await interaction.reply({
+                    content: `Notifications enabled! @everyone will be notified when the server is down.`,
+                    ephemeral: true,
+                });
+            }
+            else {
+                await UpdateOrAddGuild(interaction.guildId, null, target.id, null)
+                const targetType = target.user ? 'user' : 'role';
+                await interaction.reply({
+                    content: `Notifications enabled! The ${targetType} <@${target.id}> will be notified when the server is down.`,
+                    ephemeral: true,
+                });
+            }
+
         } else {
             await UpdateOrAddGuild(interaction.guildId, null, "", null)
             await interaction.reply({

@@ -1,5 +1,4 @@
 import {AttachmentBuilder, EmbedBuilder, InteractionReplyOptions} from "discord.js";
-import { createCanvas, loadImage } from 'canvas';
 import {GameGuild} from "./serverTypes";
 import {GetPlayersImage} from "../commands/common.js";
 
@@ -83,9 +82,14 @@ export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise
 
     if (!serverData.online) {
         if (gameGuild.adminId) {
-            content = `Attention <@${gameGuild.adminId}>!`;
+            if (gameGuild.adminId == "@everyone") {
+                content = `Attention @everyone!`
+            }
+            else {
+                content = `Attention <@${gameGuild.adminId}>!`;
+            }
         }
-        embed.setDescription(`Server url invalid or server is offline`);
+        embed.setDescription(`Server is offline!`);
     }
     else {
         try{

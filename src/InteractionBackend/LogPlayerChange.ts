@@ -13,9 +13,14 @@ export async function logPlayerChange(gameGuild: GameGuild) {
     if (!serverData.online && gameGuild.serverOnline) {
         gameGuild.serverOnline = false;
         if (gameGuild.adminId) {
-            content=`Attention <@${gameGuild.adminId}>!`;
+            if (gameGuild.adminId == "@everyone") {
+                content = `Attention @everyone!`
+            }
+            else {
+                content = `Attention <@${gameGuild.adminId}>!`;
+            }
         }
-        embed.setDescription(`Server url invalid or server is offline`);
+        embed.setDescription(`Server is offline!`);
 
         const channel = gameGuild.loggingChannelId
             ? (await client.channels.fetch(gameGuild.loggingChannelId)) as TextChannel
