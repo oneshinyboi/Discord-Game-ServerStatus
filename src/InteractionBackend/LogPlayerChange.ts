@@ -30,8 +30,8 @@ export async function logPlayerChange(gameGuild: GameGuild) {
         const oldUUIDs = new Set(gameGuild.currentPlayersList.map(player => player.uuid));
         const newUUIDs = new Set(serverData.players.list.map(player => player.uuid));
 
-        const joined = gameGuild.currentPlayersList.filter(player => !oldUUIDs.has(player.uuid));
-        const left = serverData.players.list.filter(player => !newUUIDs.has(player.uuid));
+        const joined = serverData.players.list.filter(player => !oldUUIDs.has(player.uuid));
+        const left = gameGuild.currentPlayersList.filter(player => !newUUIDs.has(player.uuid));
 
         if (joined.length > 0 || left.length > 0) {
             try {
@@ -77,6 +77,5 @@ export async function logPlayerChange(gameGuild: GameGuild) {
     if (serverData.online) {
         gameGuild.serverOnline = true;
         gameGuild.currentPlayersList = serverData.players.list;
-
     }
 }
