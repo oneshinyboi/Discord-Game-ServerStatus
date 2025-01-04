@@ -30,7 +30,7 @@ export async function interactionMcPlaytime(interaction): Promise<void> {
         if (interaction.options.getString('server')) {
             server =JSON.parse(interaction.options.getString('server'))
             try {
-                reply = await functionMap[server.Type+'playtime'](guild, server.URL);
+                reply = await functionMap[server.Type+'playtime'](guild, server);
             }
             catch {
                 reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
@@ -59,7 +59,7 @@ export async function interactionMcPlaytime(interaction): Promise<void> {
             collector.on('collect', async i => {
                 const server: Server = JSON.parse(i.values[0])
                 try {
-                    reply = await functionMap[server.Type+'playtime'](guild, server.URL);
+                    reply = await functionMap[server.Type+'playtime'](guild, server);
                 }
                 catch {}
 
