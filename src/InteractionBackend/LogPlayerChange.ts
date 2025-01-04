@@ -67,7 +67,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 name: 'Left:',
                 value: left.map(player => player.name).join(', ')
             }])
-            embed.addFields([
+            if (playerNameString.length >0) embed.addFields([
                 { name: '\u200B', value: '\u200B' },
                 {name: `Playing:`, value: playerNameString, inline: true}
             ]);

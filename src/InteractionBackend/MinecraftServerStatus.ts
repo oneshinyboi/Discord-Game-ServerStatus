@@ -107,7 +107,7 @@ export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise
                 playerNameString += `${player.name}, `;
             }
             playerNameString = playerNameString.trim().slice(0, -1);
-            embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
+            if (playerNameString.length > 0) embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
 
             try {
                 const combinedImage = await GetPlayersImage(serverData.players);
