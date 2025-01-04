@@ -3,7 +3,7 @@ import {GetGuild, UpdateOrAddGuild} from "../storage/Db.js";
 import {StartLogging, StopLogging} from "./common.js";
 
 export const LoggingChannelCommand = new SlashCommandBuilder()
-    .setName('logging-channel')
+    .setName('set-logging-channel')
     .setDescription('Designates a channel to track players joining or leaving the DefaultServer')
     .addBooleanOption(option =>
         option
@@ -28,7 +28,7 @@ export const LoggingChannelCommand = new SlashCommandBuilder()
     .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers);
 
 export async function interactionLoggingChannel(interaction): Promise<void> {
-    if (interaction.commandName === 'logging-channel' && interaction.isChatInputCommand()) {
+    if (interaction.commandName === 'set-logging-channel' && interaction.isChatInputCommand()) {
         const enabled = interaction.options.getBoolean('enabled');
         const target = interaction.options.getChannel('target');
         const interval = interaction.options.getInteger('interval');

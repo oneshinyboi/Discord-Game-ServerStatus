@@ -114,10 +114,8 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
                 const playerImage = new AttachmentBuilder(combinedImage, {name: 'players.png'});
                 embed.setImage(`attachment://players.png`);
                 return {embeds: [embed], files: [playerImage]};
-            }
-            catch {
-                return {embeds: [embed]};
-            }
+            } catch {}
         }
+        return {embeds: [embed]};
     }
 }

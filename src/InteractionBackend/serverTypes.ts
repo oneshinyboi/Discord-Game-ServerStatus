@@ -3,7 +3,7 @@ import {getReply as mcStatusGetEmbed} from "./MinecraftServerStatus.js";
 import {getReply as mcPlaytimeGetEmbed} from "./MinecraftPlaytime.js";
 import {getEmbed as terrGetEmbed} from "./TerrariaServerStatus.js";
 interface FunctionMap {
-    [key: string]: (gameGuild: GameGuild, server: Server, serverPort?: number, rconPassword?: string) => Promise<InteractionReplyOptions>;
+    [key: string]: (gameGuild: GameGuild, server: Server, rconPassword?: string) => Promise<InteractionReplyOptions>;
 }
 export enum ServerTypes {
     Terraria = "Terraria",

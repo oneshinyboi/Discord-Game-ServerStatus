@@ -1,11 +1,11 @@
 import {
     ActionRowBuilder,
-    ComponentType, EmbedBuilder, InteractionReplyOptions, Message,
+    ComponentType, EmbedBuilder, InteractionReplyOptions,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
 } from "discord.js";
 import {functionMap, GameGuild, Server, ServerTypes} from "../InteractionBackend/serverTypes.js";
-import {GetDefaultServer, GetGuild, GetServers, UpdateOrAddGuild, UpdateOrAddGuildServer} from "../storage/Db.js";
+import {GetGuild} from "../storage/Db.js";
 import {AddServerSelectMenu, GetServerChoices} from "./common.js";
 
 export const McStatusCommand = new SlashCommandBuilder()
@@ -31,27 +31,15 @@ export async function interactionMcStatus(interaction): Promise<void> {
             serverReply = await functionMap[server.Type+'status'](guild, server);
         }
         else {
-            let defaultServer: Server;
-            try {
-                defaultServer = await GetDefaultServer(interaction.guildId);
-                try {
-                    serverReply = await functionMap[defaultServer.Type+'status'](guild, defaultServer);
-                }
-                catch {
-                    reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
-                }
-                console.log(defaultServer.URL);
-
-            } catch (error) {
+            if (guild.defaultServer) {
+                serverReply = await functionMap[guild.defaultServer.Type+'status'](guild, guild.defaultServer);
+            } else {
                 console.log('could not find default server');
                 reply.embeds = [new EmbedBuilder()
                     .setDescription('Could not find default server, Did you add a server?')];
-
             }
-
-
         }
-        console.log({...reply,...serverReply});
+        console.log(serverReply);
         const serverChoices = await GetServerChoices(interaction.guildId);
         if (serverChoices.length > 1) {
             const select = new StringSelectMenuBuilder()
@@ -70,15 +58,10 @@ export async function interactionMcStatus(interaction): Promise<void> {
 
             collector.on('collect', async i => {
                 const server: Server = JSON.parse(i.values[0])
-                try {
-                    serverReply = await functionMap[server.Type+'status'](guild, server);
-                }
-                catch {}
-
+                serverReply = await functionMap[server.Type+'status'](guild, server);
                 await i.update(serverReply);
             });
         }
-
     }
     else if (interaction.commandName === 'server-status' && interaction.isAutocomplete()) {
         interaction.respond(await GetServerChoices(interaction.guildId))
