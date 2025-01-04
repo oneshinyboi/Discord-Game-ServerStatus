@@ -1,9 +1,9 @@
-import {EmbedBuilder, InteractionReplyOptions} from "discord.js";
+import {InteractionReplyOptions} from "discord.js";
 import {getReply as mcStatusGetEmbed} from "./MinecraftServerStatus.js";
 import {getReply as mcPlaytimeGetEmbed} from "./MinecraftPlaytime.js";
 import {getEmbed as terrGetEmbed} from "./TerrariaServerStatus.js";
 interface FunctionMap {
-    [key: string]: (gameGuild: GameGuild, serverUrl: string, serverPort?: number, rconPassword?: string) => Promise<InteractionReplyOptions>;
+    [key: string]: (gameGuild: GameGuild, server: Server, serverPort?: number, rconPassword?: string) => Promise<InteractionReplyOptions>;
 }
 export enum ServerTypes {
     Terraria = "Terraria",
@@ -24,8 +24,8 @@ export interface GameGuild {
     serverOnline?: boolean
 }
 export const functionMap: FunctionMap = {
-    [ServerTypes.Terraria]: (gameGuild, serverUrl) => terrGetEmbed(gameGuild, serverUrl),
-    [ServerTypes.Minecraft+'status']: (gameGuild, serverUrl) => mcStatusGetEmbed(gameGuild, serverUrl),
-    [ServerTypes.Minecraft+'playtime']: (gameGuild, serverUrl) => mcPlaytimeGetEmbed(gameGuild, serverUrl),
+    [ServerTypes.Terraria]: (gameGuild, server) => terrGetEmbed(gameGuild, server),
+    [ServerTypes.Minecraft+'status']: (gameGuild, server) => mcStatusGetEmbed(gameGuild, server),
+    [ServerTypes.Minecraft+'playtime']: (gameGuild, server) => mcPlaytimeGetEmbed(gameGuild, server),
 };
 

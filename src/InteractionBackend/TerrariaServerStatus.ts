@@ -1,7 +1,7 @@
 import {EmbedBuilder, InteractionReplyOptions} from "discord.js";
-import {GameGuild} from "./serverTypes";
+import {GameGuild, Server} from "./serverTypes.js";
 
-export async function getEmbed(gameGuild: GameGuild, serverUrl: string): Promise<InteractionReplyOptions> {
+export async function getEmbed(gameGuild: GameGuild, server: Server): Promise<InteractionReplyOptions> {
 
     const embed = new EmbedBuilder()
     embed.setTitle("Terraria is not supported yet")

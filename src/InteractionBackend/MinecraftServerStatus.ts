@@ -1,9 +1,9 @@
 import {AttachmentBuilder, EmbedBuilder, InteractionReplyOptions} from "discord.js";
-import {GameGuild} from "./serverTypes";
+import {GameGuild, Server} from "./serverTypes.js";
 import {GetPlayersImage} from "../commands/common.js";
 
-export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise<InteractionReplyOptions> {
-    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${serverUrl}`);
+export async function getReply(gameGuild: GameGuild, server: Server): Promise<InteractionReplyOptions> {
+    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${server.URL}`);
     /*const serverData = {
         "ip": "208.26.80.224",
         "port": 25565,
@@ -78,7 +78,7 @@ export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise
     const serverData = await serverInfo.json();
     let content= ""
     const embed = new EmbedBuilder()
-        .setTitle(`Info for Minecraft Server: ${serverUrl}`);
+        .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`);
 
     if (!serverData.online) {
         if (gameGuild.adminId) {
@@ -95,7 +95,7 @@ export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise
     else {
         embed
             .setColor(0x0099FF)
-            .setTitle(`Info for Minecraft Server: ${serverUrl}`)
+            .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`)
             .addFields([
                 {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
                 { name: '\u200B', value: '\u200B' },

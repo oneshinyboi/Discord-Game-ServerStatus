@@ -167,7 +167,7 @@ export async function GetServers(guildId: string): Promise<Server[]> {
                     const server: Server = {
                         URL: row["URL"],
                         Type: row["Type"],
-                        Alias: row["Alias"]?? null
+                        Alias: row["Alias"]
                     };
                     servers.push(server);
                 });
@@ -196,7 +196,8 @@ export async function GetDefaultServer(guildId: string): Promise<Server> {
                 if (serverRow) {
                     const server: Server = {
                         URL: serverRow["URL"],
-                        Type: serverRow["Type"]
+                        Type: serverRow["Type"],
+                        Alias: serverRow["Alias"]
                     };
                     resolve(server);
                 }

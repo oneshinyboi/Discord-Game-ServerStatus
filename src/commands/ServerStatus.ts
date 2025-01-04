@@ -1,9 +1,8 @@
 import {
-    ActionRowBuilder, ChatInputCommandInteraction,
-    ComponentType, EmbedBuilder, Guild, Interaction, InteractionReplyOptions, Message,
+    ActionRowBuilder,
+    ComponentType, EmbedBuilder, InteractionReplyOptions, Message,
     SlashCommandBuilder,
     StringSelectMenuBuilder,
-    StringSelectMenuOptionBuilder,
 } from "discord.js";
 import {functionMap, GameGuild, Server, ServerTypes} from "../InteractionBackend/serverTypes.js";
 import {GetDefaultServer, GetGuild, GetServers, UpdateOrAddGuild, UpdateOrAddGuildServer} from "../storage/Db.js";
@@ -29,19 +28,14 @@ export async function interactionMcStatus(interaction): Promise<void> {
 
         if (interaction.options.getString('server')) {
             server =JSON.parse(interaction.options.getString('server'))
-            try {
-                serverReply = await functionMap[server.Type+'status'](guild, server.Alias ?? server.URL);
-            }
-            catch {
-                reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
-            }
+            serverReply = await functionMap[server.Type+'status'](guild, server);
         }
         else {
             let defaultServer: Server;
             try {
                 defaultServer = await GetDefaultServer(interaction.guildId);
                 try {
-                    serverReply = await functionMap[defaultServer.Type+'status'](guild, defaultServer.URL);
+                    serverReply = await functionMap[defaultServer.Type+'status'](guild, defaultServer);
                 }
                 catch {
                     reply.embeds = [new EmbedBuilder().setDescription('Failed to fetch server data')]
@@ -77,7 +71,7 @@ export async function interactionMcStatus(interaction): Promise<void> {
             collector.on('collect', async i => {
                 const server: Server = JSON.parse(i.values[0])
                 try {
-                    serverReply = await functionMap[server.Type+'status'](guild, server.Alias ?? server.URL);
+                    serverReply = await functionMap[server.Type+'status'](guild, server);
                 }
                 catch {}
 

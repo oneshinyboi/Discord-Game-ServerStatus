@@ -1,6 +1,6 @@
 import {InteractionReplyOptions} from "discord.js";
-import {GameGuild} from "./serverTypes";
+import {GameGuild, Server} from "./serverTypes.js";
 
-export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise<InteractionReplyOptions> {
+export async function getReply(gameGuild: GameGuild, server: Server): Promise<InteractionReplyOptions> {
     return
 }
