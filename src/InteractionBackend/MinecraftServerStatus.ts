@@ -90,60 +90,34 @@ export async function getReply(gameGuild: GameGuild, serverUrl: string): Promise
             }
         }
         embed.setDescription(`Server is offline!`);
+        return {content: content, embeds: [embed]};
     }
     else {
-        try{
-            embed
-                .setColor(0x0099FF)
-                .setTitle(`Info for Minecraft Server: ${serverUrl}`)
-                .addFields([
-                    {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
-                    { name: '\u200B', value: '\u200B' },
-                ]);
-            try {
-                let playerNameString = "";
-                for (let i = 0; i < serverData.players.list.length; i++) {
-                    const player = serverData.players.list[i];
-                    playerNameString += `${player.name}, `;
-                }
-                playerNameString = playerNameString.trim().slice(0, -1);
-                embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
+        embed
+            .setColor(0x0099FF)
+            .setTitle(`Info for Minecraft Server: ${serverUrl}`)
+            .addFields([
+                {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
+                { name: '\u200B', value: '\u200B' },
+            ]);
+        if (serverData.players.list) {
+            let playerNameString = "";
+            for (let i = 0; i < serverData.players.list.length; i++) {
+                const player = serverData.players.list[i];
+                playerNameString += `${player.name}, `;
+            }
+            playerNameString = playerNameString.trim().slice(0, -1);
+            embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
 
+            try {
                 const combinedImage = await GetPlayersImage(serverData.players);
                 const playerImage = new AttachmentBuilder(combinedImage, {name: 'players.png'});
                 embed.setImage(`attachment://players.png`);
-
                 return {embeds: [embed], files: [playerImage]};
             }
-            catch {}
+            catch {
+                return {embeds: [embed]};
+            }
         }
-        catch {
-            embed
-                .setDescription(`Getting info failed :(`)
-        }
-
     }
-    //.setImage(getLogoUrl());
-    return {content: content, embeds: [embed]};
-
 }
-
-/*function getLogoUrl(iconString) {
-    var img = new Image();
-    const base64Data = serverData.icon.split(",")[1];
-        const mimeType = serverData.icon.split(":")[1].split(";")[0];
-        const blob = new Blob([atob(base64Data)], {type: mimeType})
-
-        const formData = new FormData();
-        formData.append('file', new File([atob(base64Data)], 'test.png', {type : mimeType}));
-        //formData.append('expires', new Date(new Date().getTime() +60000).toISOString());
-        //formData.append('autoDelete', true);
-
-        const url = await fetch('https://file.io/', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => console.log(data));
-    return ""
-}*/
