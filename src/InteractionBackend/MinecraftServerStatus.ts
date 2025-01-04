@@ -80,7 +80,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
     const embed = new EmbedBuilder()
         .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`);
 
-    if (!serverData.online) {
+    if (!serverData.online && serverData) {
         if (gameGuild.adminId) {
             if (gameGuild.adminId == "@everyone") {
                 content = `Attention @everyone!`
@@ -92,7 +92,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
         embed.setDescription(`Server is offline!`);
         return {content: content, embeds: [embed]};
     }
-    else {
+    else if (serverData) {
         embed
             .setColor(0x0099FF)
             .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`)
@@ -100,7 +100,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
                 {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
                 { name: '\u200B', value: '\u200B' },
             ]);
-        if (serverData.players.list) {
+        if (serverData.players?.list) {
             let playerNameString = "";
             for (let i = 0; i < serverData.players.list.length; i++) {
                 const player = serverData.players.list[i];
@@ -117,5 +117,11 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
             } catch {}
         }
         return {embeds: [embed]};
+    }
+    else {
+        embed
+            .setColor(0x0099FF)
+            .setTitle(`Could not fetch info for ${server.Alias ?? server.URL}`);
+        return {embeds: [embed]}
     }
 }

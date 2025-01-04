@@ -14,7 +14,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
     gameGuild.adminId = (await GetGuild(gameGuild.id)).adminId;
 
     if (!channel) return;
-    if (!serverData.online && gameGuild.serverOnline) {
+    if (serverData && !serverData.online && gameGuild.serverOnline) {
         let content = ""
         gameGuild.serverOnline = false;
         if (gameGuild.adminId) {
@@ -30,11 +30,11 @@ export async function logPlayerChange(gameGuild: GameGuild) {
         await channel.send({ content, embeds: [embed] });
         return;
     }
-    if (gameGuild.currentPlayersList) {
+    else if (serverData && gameGuild.currentPlayersList) {
         const oldUUIDs = new Set(gameGuild.currentPlayersList.map(player => player.uuid));
-        const newUUIDs = new Set(serverData.players.list?.map(player => player.uuid) ?? []);
+        const newUUIDs = new Set(serverData.players?.list?.map(player => player.uuid) ?? []);
 
-        const joined = serverData.players.list?.filter(player => !oldUUIDs.has(player.uuid)) ?? [];
+        const joined = serverData.players?.list?.filter(player => !oldUUIDs.has(player.uuid)) ?? [];
         const left = gameGuild.currentPlayersList.filter(player => !newUUIDs.has(player.uuid));
 
         if (joined.length > 0 || left.length > 0) {
@@ -44,7 +44,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 files: []
             };
 
-            if (serverData.players.list) {
+            if (serverData.players?.list) {
                 for (let i = 0; i < serverData.players.list.length; i++) {
                     const player = serverData.players.list[i];
                     playerNameString += `${player.name}, `;
@@ -77,8 +77,14 @@ export async function logPlayerChange(gameGuild: GameGuild) {
 
         }
     }
+    else if (!serverData){
+        embed
+            .setColor(0x0099FF)
+            .setTitle(`Could not fetch info for ${gameGuild.defaultServer.Alias ?? gameGuild.defaultServer.URL}`);
+        await channel.send({embeds: [embed]});
+    }
     if (serverData.online) {
         gameGuild.serverOnline = true;
-        gameGuild.currentPlayersList = serverData.players.list ?? [];
+        gameGuild.currentPlayersList = serverData.players?.list ?? [];
     }
 }

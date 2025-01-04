@@ -40,10 +40,10 @@ export async function interactionNotifyAdmin(interaction): Promise<void> {
                 });
             }
             else {
-                await UpdateOrAddGuild(interaction.guildId, null, target.id, null)
+                await UpdateOrAddGuild(interaction.guildId, null, target.user ? target.id : "&"+target.id, null)
                 const targetType = target.user ? 'user' : 'role';
                 await interaction.reply({
-                    content: `Notifications enabled! The ${targetType} <@${target.id}> will be pinged when the server is down.`,
+                    content: `Notifications enabled! The ${targetType} <@${target.user ? target.id : "&"+target.id}> will be pinged when the server is down.`,
                     ephemeral: true,
                 });
             }
