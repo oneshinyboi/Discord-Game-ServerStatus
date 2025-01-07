@@ -45,6 +45,7 @@ export function TryGetServer(interaction): {server: Server, result: boolean} {
 export function StartLogging(guild: GameGuild) {
     StopLogging(guild);
     guild.serverOnline = true;
+    guild.downCount = 0;
     const intervalId = setInterval(async () => {
         await logPlayerChange(guild);
     }, guild.loggingChannelInterval * 60 * 1000)

@@ -15,6 +15,11 @@ export async function logPlayerChange(gameGuild: GameGuild) {
 
     if (!channel) return;
     if (serverData && !serverData.online && gameGuild.serverOnline) {
+        if (gameGuild.downCount < 2) {
+            gameGuild.downCount += 1;
+            return;
+        }
+        gameGuild.downCount = 0;
         let content = ""
         gameGuild.serverOnline = false;
         if (gameGuild.adminId) {

@@ -14,6 +14,7 @@
     "canvas": "^3.0.1",
     "discord-api-types": "^0.37.90",
     "discord.js": "^14.15.3",
+    "minecraft-status": "^1.1.0",
     "sqlite3": "^5.1.7"
   },
   "devDependencies": {

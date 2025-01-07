@@ -21,7 +21,8 @@ export interface GameGuild {
     loggingChannelId?: string | null,
     loggingChannelInterval?: number | null,
     currentPlayersList?: any[],
-    serverOnline?: boolean
+    serverOnline?: boolean,
+    downCount?: number
 }
 export const functionMap: FunctionMap = {
     [ServerTypes.Terraria]: (gameGuild, server) => terrGetEmbed(gameGuild, server),
