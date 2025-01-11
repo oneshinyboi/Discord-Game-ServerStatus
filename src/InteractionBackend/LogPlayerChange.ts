@@ -5,6 +5,7 @@ import {client} from "../main.js";
 import {GetGuild} from "../storage/Db.js";
 
 export async function logPlayerChange(gameGuild: GameGuild) {
+    //funny business is going on with the api, returning offline sometimes when server is online
     const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${gameGuild.defaultServer.URL}`);
     const serverData = await serverInfo.json();
     const embed = new EmbedBuilder()
@@ -30,7 +31,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 content = `Attention <@${gameGuild.adminId}>!`;
             }
         }
-        embed.setDescription(`Server is offline!`);
+        embed.setDescription(`Bot could not reach server :(`);
 
         await channel.send({ content, embeds: [embed] });
         return;
