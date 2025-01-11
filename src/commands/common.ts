@@ -50,14 +50,14 @@ export function StartLogging(guild: GameGuild) {
         await logPlayerChange(guild);
     }, guild.loggingChannelInterval * 60 * 1000)
 
-    scheduledIntervals.set(guild, intervalId);
+    scheduledIntervals.set(guild.id, intervalId);
 }
 
 export function StopLogging(guild: GameGuild) {
-    const intervalId = scheduledIntervals.get(guild);
+    const intervalId = scheduledIntervals.get(guild.id);
     if (intervalId) {
         clearInterval(intervalId);
-        scheduledIntervals.delete(guild);
+        scheduledIntervals.delete(guild.id);
     }
 }
 
