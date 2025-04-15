@@ -41,7 +41,6 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
                 {name: 'Max Players', value: `${statusResponse.players.max}`, inline: true},
                 {name: 'Version', value: `${statusResponse.version.name}`},
                 {name: 'Motd', value: `${statusResponse.motd.clean}`},
-                { name: '\u200B', value: '\u200B' },
             ]);
         if (statusResponse.players?.sample) {
             let playerNameString = "";
@@ -50,7 +49,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
                 playerNameString += `${player.name}, `;
             }
             playerNameString = playerNameString.trim().slice(0, -1);
-            if (playerNameString.length > 0) embed.addFields([{name: `Playing:`, value: playerNameString, inline: true}]);
+            if (playerNameString.length > 0) embed.addFields([{ name: '\u200B', value: '\u200B' }, {name: `Playing:`, value: playerNameString, inline: true}]);
 
             try {
                 const combinedImage = await GetPlayersImage(statusResponse.players);
