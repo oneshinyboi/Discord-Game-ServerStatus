@@ -40,7 +40,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
                 {name: 'Online Players', value: `${statusResponse.players.online}`, inline: true},
                 {name: 'Max Players', value: `${statusResponse.players.max}`, inline: true},
                 {name: 'Version', value: `${statusResponse.version.name}`},
-                {name: 'Motd', value: `${statusResponse.motd.clean[0]}`},
+                {name: 'Motd', value: `${statusResponse.motd.clean}`},
                 { name: '\u200B', value: '\u200B' },
             ]);
         if (statusResponse.players?.sample) {
