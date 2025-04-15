@@ -20,7 +20,10 @@ export interface GameGuild {
     adminId?: string | null,
     loggingChannelId?: string | null,
     loggingChannelInterval?: number | null,
-    currentPlayersList?: any[],
+    currentPlayersList?: {
+        name: string
+        id: string
+    }[],
     serverOnline?: boolean,
     downCount?: number
 }

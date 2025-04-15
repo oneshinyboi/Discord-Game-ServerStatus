@@ -3,11 +3,21 @@ import {AttachmentBuilder, EmbedBuilder, TextChannel} from "discord.js";
 import {GetPlayersImage} from "../commands/common.js";
 import {client} from "../main.js";
 import {GetGuild} from "../storage/Db.js";
+import * as mc from 'minecraft-server-util'
+import {JavaStatusResponse} from "minecraft-server-util";
 
 export async function logPlayerChange(gameGuild: GameGuild) {
-    //funny business is going on with the api, returning offline sometimes when server is online
-    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${gameGuild.defaultServer.Host}`);
-    const serverData = await serverInfo.json();
+    let statusResponse: JavaStatusResponse
+    let isOnline = false;
+
+    try {
+        statusResponse = await mc.status(gameGuild.defaultServer.Host);
+        isOnline = true;
+    } catch (error) {
+        console.error(`Failed to query server ${gameGuild.defaultServer.Host}:`, error);
+        return;
+    }
+
     const embed = new EmbedBuilder()
     const channel = gameGuild.loggingChannelId
         ? (await client.channels.fetch(gameGuild.loggingChannelId)) as TextChannel
@@ -15,7 +25,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
     gameGuild.adminId = (await GetGuild(gameGuild.id)).adminId;
 
     if (!channel) return;
-    if (serverData && !serverData.online && gameGuild.serverOnline) {
+    if (!isOnline && gameGuild.serverOnline) {
         if (gameGuild.downCount < 2) {
             gameGuild.downCount += 1;
             return;
@@ -31,36 +41,36 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 content = `Attention <@${gameGuild.adminId}>!`;
             }
         }
-        embed.setDescription(`Bot could not reach server :(`);
+        embed.setDescription(`Bot could not reach server, it may be offline!`);
 
         await channel.send({ content, embeds: [embed] });
         return;
     }
-    else if (serverData && gameGuild.currentPlayersList) {
-        const oldUUIDs = new Set(gameGuild.currentPlayersList.map(player => player.uuid));
-        const newUUIDs = new Set(serverData.players?.list?.map(player => player.uuid) ?? []);
+    else if (isOnline && gameGuild.currentPlayersList) {
+        const oldUUIDs = new Set(gameGuild.currentPlayersList.map(player => player.id));
+        const newUUIDs = new Set(statusResponse.players?.sample?.map(player => player.id) ?? []);
 
-        const joined = serverData.players?.list?.filter(player => !oldUUIDs.has(player.uuid)) ?? [];
-        const left = gameGuild.currentPlayersList.filter(player => !newUUIDs.has(player.uuid));
+        const joined = statusResponse.players?.sample?.filter(player => !oldUUIDs.has(player.id)) ?? [];
+        const left = gameGuild.currentPlayersList.filter(player => !newUUIDs.has(player.id));
 
         if (joined.length > 0 || left.length > 0) {
             let playerNameString = ""
-            const tosend = {
+            const toSend = {
                 embeds: [],
                 files: []
             };
 
-            if (serverData.players?.list) {
-                for (let i = 0; i < serverData.players.list.length; i++) {
-                    const player = serverData.players.list[i];
+            if (statusResponse.players?.sample) {
+                for (let i = 0; i < statusResponse.players.sample.length; i++) {
+                    const player = statusResponse.players.sample[i];
                     playerNameString += `${player.name}, `;
                 }
                 playerNameString = playerNameString.trim().slice(0, -1);
                 try {
-                    const combinedImage = await GetPlayersImage(serverData.players);
+                    const combinedImage = await GetPlayersImage(statusResponse.players);
                     const playerImage = new AttachmentBuilder(combinedImage, {name: 'players.png'});
                     embed.setImage(`attachment://players.png`);
-                    tosend.files = [playerImage]
+                    toSend.files = [playerImage]
                 }
                 catch {}
 
@@ -78,19 +88,13 @@ export async function logPlayerChange(gameGuild: GameGuild) {
                 {name: `Playing:`, value: playerNameString, inline: true}
             ]);
 
-            tosend.embeds = [embed];
-            await channel.send(tosend);
+            toSend.embeds = [embed];
+            await channel.send(toSend);
 
         }
     }
-    else if (!serverData){
-        embed
-            .setColor(0x0099FF)
-            .setTitle(`Could not fetch info for ${gameGuild.defaultServer.Alias ?? gameGuild.defaultServer.Host}`);
-        await channel.send({embeds: [embed]});
-    }
-    if (serverData.online) {
+    if (isOnline) {
         gameGuild.serverOnline = true;
-        gameGuild.currentPlayersList = serverData.players?.list ?? [];
+        gameGuild.currentPlayersList = statusResponse.players?.sample ?? [];
     }
 }
