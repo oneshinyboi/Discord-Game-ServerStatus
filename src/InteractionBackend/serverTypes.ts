@@ -10,7 +10,7 @@ export enum ServerTypes {
     Minecraft = "Minecraft",
 }
 export interface Server {
-    URL: string,
+    Host: string,
     Type: ServerTypes,
     Alias?: string | null
 }

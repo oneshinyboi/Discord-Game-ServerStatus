@@ -16,7 +16,7 @@ export async function AddServerSelectMenu(guildId: string, selectMenuBuilder: Se
     options.forEach((server) => {
         selectMenuBuilder.addOptions(
             new StringSelectMenuOptionBuilder()
-                .setLabel(server.Alias ?? server.URL)
+                .setLabel(server.Alias ?? server.Host)
                 .setValue(JSON.stringify(server))
                 .setDescription(`${server.Type} server`)
         )
@@ -26,13 +26,13 @@ export async function GetServerChoices(guildId: string): Promise<ChoiceOption[]>
     const option: ChoiceOption[] = [];
     const servers = await GetServers(guildId);
     servers.forEach((server) => {
-        option.push({name: `${server.Alias ? server.Alias + ',' : ''} ${server.URL}, ${server.Type}`, value: JSON.stringify(server)});
+        option.push({name: `${server.Alias ? server.Alias + ',' : ''} ${server.Host}, ${server.Type}`, value: JSON.stringify(server)});
     })
     return option;
 }
 
 export function TryGetServer(interaction): {server: Server, result: boolean} {
-    let server: Server = {URL: "", Type: ServerTypes.Minecraft}; //defining server just to make the compiler happy
+    let server: Server = {Host: "", Type: ServerTypes.Minecraft}; //defining server just to make the compiler happy
     try {
         server = JSON.parse(interaction.options.getString('server'));
         return {server: server, result: true};

@@ -3,7 +3,7 @@ import {GameGuild, Server} from "./serverTypes.js";
 import {GetPlayersImage} from "../commands/common.js";
 
 export async function getReply(gameGuild: GameGuild, server: Server): Promise<InteractionReplyOptions> {
-    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${server.URL}`);
+    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${server.Host}`);
     /*const serverData = {
         "ip": "208.26.80.224",
         "port": 25565,
@@ -78,7 +78,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
     const serverData = await serverInfo.json();
     let content= ""
     const embed = new EmbedBuilder()
-        .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`);
+        .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.Host}`);
 
     if (!serverData.online && serverData) {
         if (gameGuild.adminId) {
@@ -95,7 +95,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
     else if (serverData) {
         embed
             .setColor(0x0099FF)
-            .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.URL}`)
+            .setTitle(`Info for Minecraft Server: ${server.Alias ?? server.Host}`)
             .addFields([
                 {name: 'Online Players', value: `${serverData.players.online}`, inline: true},
                 { name: '\u200B', value: '\u200B' },
@@ -121,7 +121,7 @@ export async function getReply(gameGuild: GameGuild, server: Server): Promise<In
     else {
         embed
             .setColor(0x0099FF)
-            .setTitle(`Could not fetch info for ${server.Alias ?? server.URL}`);
+            .setTitle(`Could not fetch info for ${server.Alias ?? server.Host}`);
         return {embeds: [embed]}
     }
 }

@@ -125,7 +125,7 @@ export async function UpdateOrAddGuildServer(guildId: string, server: Server): P
         db.serialize(() => {
             db.get(`SELECT *
                     FROM GuildServer
-                    WHERE GuildId = ? AND URL = ?`, [guildId, server.URL], (err, row) => {
+                    WHERE GuildId = ? AND URL = ?`, [guildId, server.Host], (err, row) => {
                 if (err) {
                     return reject(`Error retrieving guildServer: ${err.message}`);
                 }
@@ -133,7 +133,7 @@ export async function UpdateOrAddGuildServer(guildId: string, server: Server): P
                 if (row) {
                     db.run(`UPDATE GuildServer
                             SET Type = ?, Alias = ?
-                            WHERE GuildId = ? AND URL = ?`, [server.Type, server.Alias?? null,guildId, server.URL], (err) => {
+                            WHERE GuildId = ? AND URL = ?`, [server.Type, server.Alias?? null,guildId, server.Host], (err) => {
                         if (err) {
                             return reject(`Error updating guildServer: ${err.message}`);
                         }
@@ -141,7 +141,7 @@ export async function UpdateOrAddGuildServer(guildId: string, server: Server): P
                     });
                 } else {
                     db.run(`INSERT INTO GuildServer (GuildId, URL, Type, Alias)
-                            VALUES (?, ?, ?, ?)`, [guildId, server.URL, server.Type, server.Alias?? null], (err) => {
+                            VALUES (?, ?, ?, ?)`, [guildId, server.Host, server.Type, server.Alias?? null], (err) => {
                         if (err) {
                             return reject(`Error adding new guildServer: ${err.message}`);
                         }
@@ -165,7 +165,7 @@ export async function GetServers(guildId: string): Promise<Server[]> {
             if (rows) {
                 rows.forEach((row) => {
                     const server: Server = {
-                        URL: row["URL"],
+                        Host: row["URL"],
                         Type: row["Type"],
                         Alias: row["Alias"]
                     };
@@ -195,7 +195,7 @@ export async function GetDefaultServer(guildId: string): Promise<Server> {
                 }
                 if (serverRow) {
                     const server: Server = {
-                        URL: serverRow["URL"],
+                        Host: serverRow["URL"],
                         Type: serverRow["Type"],
                         Alias: serverRow["Alias"]
                     };
@@ -222,7 +222,7 @@ export async function RemoveServer(guildId: string, server: Server): Promise<voi
             if (err) {
                 return reject(`Error selecting from Guilds`);
             }
-            if (row && row["DefaultServerURL"] == server.URL) {
+            if (row && row["DefaultServerURL"] == server.Host) {
                 db.run(`UPDATE Guilds
                     SET DefaultServerURL = ?
                     WHERE GuildId = ?`, ["", guildId], (err) => {
@@ -234,9 +234,9 @@ export async function RemoveServer(guildId: string, server: Server): Promise<voi
             });
             db.run(`DELETE
                 FROM GuildServer
-                WHERE GuildId = ? AND URL = ?`, [guildId, server.URL], (err) => {
+                WHERE GuildId = ? AND URL = ?`, [guildId, server.Host], (err) => {
             if (err) {
-                return reject(`Error deleting row for guildId: ${guildId}, URL: ${server.URL}`)
+                return reject(`Error deleting row for guildId: ${guildId}, URL: ${server.Host}`)
             }
             resolve();
             })

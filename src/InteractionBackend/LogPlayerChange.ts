@@ -6,7 +6,7 @@ import {GetGuild} from "../storage/Db.js";
 
 export async function logPlayerChange(gameGuild: GameGuild) {
     //funny business is going on with the api, returning offline sometimes when server is online
-    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${gameGuild.defaultServer.URL}`);
+    const serverInfo = await fetch(`https://api.mcsrvstat.us/3/${gameGuild.defaultServer.Host}`);
     const serverData = await serverInfo.json();
     const embed = new EmbedBuilder()
     const channel = gameGuild.loggingChannelId
@@ -86,7 +86,7 @@ export async function logPlayerChange(gameGuild: GameGuild) {
     else if (!serverData){
         embed
             .setColor(0x0099FF)
-            .setTitle(`Could not fetch info for ${gameGuild.defaultServer.Alias ?? gameGuild.defaultServer.URL}`);
+            .setTitle(`Could not fetch info for ${gameGuild.defaultServer.Alias ?? gameGuild.defaultServer.Host}`);
         await channel.send({embeds: [embed]});
     }
     if (serverData.online) {

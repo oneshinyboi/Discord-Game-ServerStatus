@@ -34,18 +34,18 @@ export async function interactionAddServer(interaction) {
     if (!interaction.isChatInputCommand()) return;
     if (interaction.commandName === 'add-server') {
         const server: Server = {
-            URL: interaction.options.getString('host').trim(),
+            Host: interaction.options.getString('host').trim(),
             Type: interaction.options.getString('game').trim(),
         };
         if (interaction.options.get('alias')) {
             server.Alias = interaction.options.getString('alias')
         }
         if ((await GetServerChoices(interaction.guildId)).length <= 0) {
-            await UpdateOrAddGuild(interaction.guildId, server.URL)
+            await UpdateOrAddGuild(interaction.guildId, server.Host)
         }
         UpdateOrAddGuildServer(interaction.guildId, server)
             .then(() => {
-                return interaction.reply({content: `Added ${server.URL} ${server.Alias? `as ${server.Alias}` : ''}`, ephemeral: true});
+                return interaction.reply({content: `Added ${server.Host} ${server.Alias? `as ${server.Alias}` : ''}`, ephemeral: true});
             })
             .catch(error => {
                 console.error(error);

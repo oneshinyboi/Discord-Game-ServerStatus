@@ -23,7 +23,7 @@ export async function interactionMcPlaytime(interaction): Promise<void> {
     if (interaction.commandName == 'playtime' && interaction.isChatInputCommand()) {
 
         let reply: InteractionReplyOptions = {fetchReply: true};
-        let server: Server = {URL: "", Type: ServerTypes.Minecraft}; //defining server just to make the compiler happy
+        let server: Server = {Host: "", Type: ServerTypes.Minecraft}; //defining server just to make the compiler happy
         let guild: GameGuild = await GetGuild(interaction.guildId)
 
 

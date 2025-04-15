@@ -21,7 +21,7 @@ export async function  interactionDeleteServer(interaction) {
 
         await RemoveServer(interaction.guildId, server)
             .then(() => {
-                return interaction.reply({content: `Deleted ${server.URL}`, ephemeral: true})
+                return interaction.reply({content: `Deleted ${server.Host}`, ephemeral: true})
             })
             .catch(error => {
                 console.error(error)

@@ -20,10 +20,10 @@ export async function interactionDefaultServer(interaction) {
         let server = tryResult.server;
         if (tryResult.result == false) {return}
 
-        await UpdateOrAddGuild(interaction.guildId, server.URL);
+        await UpdateOrAddGuild(interaction.guildId, server.Host);
         UpdateOrAddGuildServer(interaction.guildId, server)
             .then(() => {
-                return interaction.reply({content: `Added ${server.URL} as the default server`, ephemeral: true});
+                return interaction.reply({content: `Added ${server.Host} as the default server`, ephemeral: true});
             })
             .catch(error => {
                 console.error(error);
