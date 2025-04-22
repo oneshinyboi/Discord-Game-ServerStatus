@@ -58,6 +58,7 @@ export async function interactionMcStatus(interaction): Promise<void> {
 
             collector.on('collect', async i => {
                 const server: Server = JSON.parse(i.values[0])
+                // TODO fix these functionMap calls so they arent undefined for terraria
                 serverReply = await functionMap[server.Type+'status'](guild, server);
                 await i.update(serverReply);
             });

@@ -8,11 +8,12 @@ import {DefaultServerCommand, interactionDefaultServer} from "./commands/Default
 import {DeleteServerCommand, interactionDeleteServer} from "./commands/DeleteServer.js";
 import {NotifyAdminCommand, interactionNotifyAdmin} from "./commands/NotifyAdmin.js";
 import {LoggingChannelCommand, interactionLoggingChannel} from "./commands/LoggingChannel.js";
+import {McOnlineCommand, interactionMcOnline} from "./commands/Online.js";
 
 import {UpdateOrAddGuild} from "./storage/Db.js";
 import {InitializeLogging} from "./commands/common.js";
 
-const commands= [AddServerCommand, McStatusCommand, McPlaytimeCommand, DefaultServerCommand, DeleteServerCommand, NotifyAdminCommand, LoggingChannelCommand];
+const commands= [AddServerCommand, McStatusCommand, McPlaytimeCommand, McOnlineCommand ,DefaultServerCommand, DeleteServerCommand, NotifyAdminCommand, LoggingChannelCommand];
 
 const rest = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
@@ -36,6 +37,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 });
 client.on(Events.InteractionCreate, interactionMcStatus);
 client.on(Events.InteractionCreate, interactionMcPlaytime);
+client.on(Events.InteractionCreate, interactionMcOnline);
 client.on(Events.InteractionCreate, interactionAddServer);
 client.on(Events.InteractionCreate, interactionDefaultServer);
 client.on(Events.InteractionCreate, interactionDeleteServer);
